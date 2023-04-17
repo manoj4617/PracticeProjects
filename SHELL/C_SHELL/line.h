@@ -6,6 +6,7 @@ char* myshell_readline(void){
     int myshell_buffer_size = BUFFERSIZE;
     int position = 0;
     char* buffer = malloc(sizeof(char) * myshell_buffer_size);
+    
     int c;
 
     // check for allocation failure
