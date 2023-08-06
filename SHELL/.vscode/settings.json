@@ -1,6 +1,0 @@
-{
-    "files.associations": {
-        "*.ejs": "html",
-        "my_shell_headers.h": "c"
-    }
-}
