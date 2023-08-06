@@ -1,0 +1,13 @@
+{
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/home/manoj4617/Practice/TCP-Server",
+            "binaryPath": "/home/manoj4617/Practice/TCP-Server/client",
+            "binaryArgs": []
+        }
+    ],
+    "files.associations": {
+        "*.ejs": "html",
+        "iostream": "cpp"
+    }
+}

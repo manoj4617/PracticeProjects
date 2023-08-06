@@ -1,0 +1,32 @@
+CC=g++
+CFLAGS=-c -Wall -g
+LDFLAGS=
+SERVER_SOURCE=server.cpp
+CLIENT_SOURCE=client.cpp
+SERVER_OBJECTS=$(SERVER_SOURCE:.cpp=.o)
+CLIENT_OBEJECTS=$(CLIENT_SOURCE:.cpp=.o)
+SERVER_EXE=server
+CLIENT_EXE=client
+
+all : $(SERVER_SOURCE) $(CLIENT_SOURCE) $(SERVER_EXE) $(CLIENT_EXE)
+
+$(SERVER_EXE): $(SERVER_OBJECTS)
+	$(CC) $(LDFLAGS) $(SERVER_OBJECTS) -o $@
+
+$(CLIENT_EXE): $(CLIENT_OBEJECTS)
+	$(CC) $(LDFLAGS) $(CLIENT_OBEJECTS) -o $@
+
+.cpp.o:
+	$(CC) $(CFLAGS) $< -o $@
+
+clean:
+	rm -rf $(SERVER_OBJECTS) $(CLIENT_OBEJECTS) $(SERVER_EXE) $(CLIENT_EXE)
+
+run_debug_server:
+	gdb $(SERVER_EXE)
+
+run_server:
+	./$(SERVER_EXE)
+
+run_client:
+	./$(CLIENT_EXE)

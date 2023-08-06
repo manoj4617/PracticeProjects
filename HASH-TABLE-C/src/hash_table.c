@@ -3,14 +3,21 @@
 #include<string.h>
 
 #include "hash_table.h"
+#include "prime.h"
+#include "ht_resize.h"
 
 #define HT_PRIME_1 151
 #define HT_PRIME_2 161
 
+
 /*
-The below function is marked static because it will
-only be accessed internally by the has table
+It calls the resizable hash creation function
 */
+h_hash_table* ht_new(){
+    return ht_resizeable(HT_INITIAL_BASE_SIZE);
+}
+
+
 static h_item* ht_new_item(
     const char* key,
     const char* value
@@ -23,25 +30,9 @@ static h_item* ht_new_item(
     return new_item;
 }
 
-
-/*
-The below function initialises a new hash table of predefined size
-calloc() fills array of items with NULL
-*/
-h_hash_table* ht_new(){
-    h_hash_table* ht = malloc(sizeof(h_hash_table));
-
-    ht->size = 64;
-    ht->count = 0;
-    ht->items = calloc((size_t)ht->size,sizeof(h_item));
-
-    return ht;
-}
-
 /*
 Deleting the items from the hash table
 */
-
 static void ht_delete_item(h_item* item){
     free(item->key);
     free(item->value);
@@ -96,4 +87,94 @@ static int ht_get_hash(
     return (hash_a + (attempts * (hash_b + 1))) % num_buckets;
 }
 
+/*
+Inserting value into the hash
+*/
+void ht_insert(
+    h_hash_table* ht,
+    const char* key,
+    const char* value
+)
+{
+    const int load = ht->count * 100 / ht->size;
+    if(load > 70){
+        ht_resize_up(ht);
+    }
+
+    h_item* item = ht_new_item(key,value);
+    int index = ht_get_hash(item->key, ht->size,0);
+
+    h_item* current = ht->items[index];
+    int i = 1;
+    while(current != NULL && current != &HT_DELETED_ITEM){
+
+        if(strcmp(current->key, key) == 0){
+            ht_delete_item(current);
+            ht->items[index] = item;
+            return;
+        }
+
+        index = ht_get_hash(item->key, ht->size, i);
+        current = ht->items[index];
+        i++;
+    }
+
+    ht->items[index] = item;
+    ht->count++;
+}
+
+/*
+Searching
+*/
+
+char* ht_search(
+    h_hash_table* ht, 
+    const char* key)
+{
+    int index = ht_get_hash(key, ht->size, 0);
+    h_item* item = ht->items[index];
+    int i = 0;
+
+    while(item != NULL){
+        if(item != &HT_DELETED_ITEM){
+            if(strcmp(item->key, key) == 0){
+                return item->key;
+            }
+        }
+        index = ht_get_hash(key, ht->size,i);
+        item = ht->items[index];
+        i++;
+    }
+
+    return NULL;
+}
+
+
+void ht_delete(
+    h_hash_table* ht,
+    const char* key
+)
+{
+    const int load = ht->count * 100 / ht->size;
+    if(load < 10){
+        ht_resize_down(ht);
+    }
+
+    int index = ht_get_hash(key, ht->size, 0);
+    h_item* item = ht->items[index];
+
+    int i = 1;
+    while(item != NULL){
+        if(item != &HT_DELETED_ITEM){
+            if(strcmp(item->key, key) == 0){
+                ht_delete_item(item);
+                ht->items[index] = &HT_DELETED_ITEM;
+            }
+        }
+        index = ht_get_hash(key, ht->size, i);
+        item = ht->items[index];
+        i++;
+    }
+    ht->count--;
+}
 
