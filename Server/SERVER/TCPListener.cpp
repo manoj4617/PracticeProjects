@@ -102,7 +102,14 @@ SOCKET TCPListener::CreateSocket() {
 //Wait for connection
 SOCKET TCPListener::WaitForConnection(SOCKET listening){
 
-	SOCKET client = accept(listening, NULL, NULL);
+	sockaddr_in client_addr;
+	char clientIP[INET_ADDRSTRLEN];
+	int client_size = sizeof(client_addr);
+	SOCKET client = accept(listening, (sockaddr*)&client_addr, &client_size);
+
+	inet_ntop(AF_INET, &(client_addr.sin_addr), clientIP, INET_ADDRSTRLEN);
+	std::cout << "Client connected: " << clientIP
+		<< ", port " << ntohs(client_addr.sin_port) << "\n";
 	return client;
 }
 
