@@ -9,7 +9,7 @@ using namespace std;
 
 void main()
 {
-	//Initialize winsock
+	//Initialize winsock  
 	WSADATA wsData;
 	WORD version = MAKEWORD(2, 2);
 
